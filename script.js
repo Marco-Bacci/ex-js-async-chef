@@ -4,16 +4,25 @@
 // Usare userId per ottenere le informazioni dello chef da https://dummyjson.com/users/{userId}
 // Restituire la data di nascita dello chef
 
-
-
-
 async function getChefBirthday(id) {
-  const ricettaRes = await fetch(`https://dummyjson.com/recipes/${id}`);
-  const ricetta = await ricettaRes.json();
+  let ricetta;
+  try {
+    const ricettaRes = await fetch(`https://dummyjson.com/recipes/${id}`);
+    ricetta = await ricettaRes.json();
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Ricetta con id ${id} non recuperata`);
+  }
   const userId = ricetta.userId;
-  const userRes = await fetch(`https://dummyjson.com/users/${userId}`);
-  const user = await userRes.json();
-  return dayjs(user.birthDate).format('DD/MM/YYYY');
+  let user;
+  try {
+    const userRes = await fetch(`https://dummyjson.com/users/${userId}`);
+    user = await userRes.json();
+  } catch (error) {
+    console.error(error);
+    throw new Error(`usercon id ${id} non recuperato`);
+  }
+  return dayjs(user.birthDate).format("DD/MM/YYYY");
 }
 
 (async () => {
@@ -21,7 +30,8 @@ async function getChefBirthday(id) {
     const chefBirthday = await getChefBirthday(1);
     console.log(`Data di nascita dello chef: ${chefBirthday}`);
   } catch (error) {
-    console.error(error)
+    console.error(error);
+  } finally {
+    console.log("fine!");
   }
-  finally{console.log("fine!")};
 })();
